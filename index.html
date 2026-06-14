@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>《廉頗藺相如列傳》分層評估挑戰測驗</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #2980b9;
+            --card-background: rgba(255, 255, 255, 0.92);
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --level-deep: #8e44ad;
+            --level-shallow: #d35400;
+        }
+
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), 
+                              url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .quiz-container {
+            background-color: var(--card-background);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 720px;
+            padding: 35px;
+            box-sizing: border-box;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1.75rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #5a6364;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            border-bottom: 2px solid rgba(189, 195, 199, 0.6);
+            padding-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            font-size: 0.95rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .level-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .question {
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            white-space: pre-line;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 12px;
+        }
+
+        .underline {
+            text-decoration: underline;
+            font-weight: bold;
+            color: #e67e22;
+            padding: 0 4px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+        }
+
+        .option-item {
+            background-color: rgba(248, 249, 250, 0.85);
+            padding: 15px 20px;
+            margin-bottom: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .option-item:hover {
+            background-color: #ffffff;
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .option-item.selected {
+            background-color: #ebf5fb;
+            border-color: var(--accent-color);
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(41, 128, 185, 0.1);
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-submit:hover {
+            background-color: #1f618d;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-submit:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-area {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-area.correct {
+            display: block;
+            background-color: rgba(212, 239, 223, 0.9);
+            color: #196f3d;
+            border-left: 5px solid var(--success-color);
+        }
+
+        .result-area.wrong {
+            display: block;
+            background-color: rgba(250, 219, 216, 0.9);
+            color: #78281f;
+            border-left: 5px solid var(--error-color);
+        }
+
+        .explanation {
+            margin-top: 10px;
+            font-size: 0.98rem;
+            color: #4a5568;
+            white-space: pre-line;
+        }
+
+        .score-summary {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>《廉頗藺相如列傳》</h1>
+    <div class="subtitle">自主分層評估挑戰測驗</div>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress">準備開始</div>
+        <div class="level-badge" id="level-tag"></div>
+    </div>
+    
+    <div id="quiz-box">
+        <div class="question" id="question-text">題目載入中...</div>
+        <ul class="options-list" id="options-container">
+            <!-- 選項 -->
+        </ul>
+        <button class="btn-submit" id="submit-btn" disabled>提交答案</button>
+        <div class="result-area" id="result-box">
+            <span id="result-status"></span>
+            <div class="explanation" id="explanation-text"></div>
+        </div>
+    </div>
+    
+    <div id="summary-box" style="display: none;" class="score-summary">
+        <!-- 結果 -->
+    </div>
+</div>
+
+<script>
+    const allQuestions = {
+        routing: {
+            question: "【課前自評】請根據你目前的溫習進度，誠實評估自己的狀態：\n\n「你認為自己有多了解這篇文章？」",
+            options: ["十分了解", "了解未算深入"],
+            explanation: "系統將根據你的自評選擇，為你動態配置最適合你現階段能力的題目組別。請按「下一題」開始挑戰！"
+        },
+        
+        // 【淺】難度題目組（保持原有流暢度與基礎設定，共 20 題）
+        shallow: [
+            {
+                question: "【淺．字詞語譯】試解釋加底線的字：\n「欲予秦，秦城恐不可得，徒<span class='underline'>見</span>欺。」",
+                options: ["看見", "被、受", "拜見", "表現"],
+                correct: 1,
+                explanation: "解析：根據注釋，「見」在這裡表示被動，解作「被」或「受」。「徒見欺」即白白被欺騙。[cite: 2]"
+            },
+            {
+                question: "【淺．字詞語譯】試解釋加底線的字：\n「相如每朝時，常稱病，不欲與廉頗爭<span class='underline'>列</span>。」",
+                options: ["爭論是非", "排列的位置、官位高下", "隊伍的秩序", "分裂國家"],
+                correct: 1,
+                explanation: "解析：根據注釋，「列」指排列的位置，引申為官位的高低。相如不欲與廉頗爭朝堂上的位次。[cite: 2]"
+            },
+            {
+                question: "【淺．字詞語譯】試解釋加底線的字：\n「臣所以<span class='underline'>去</span>親戚而事君者，徒慕君之高義也。」",
+                options: ["前往某地", "丟失物品", "離開", "去除缺點"],
+                correct: 2,
+                explanation: "解析：根據注釋，「去」在此處解作「離開」。全句指門客離開自己的親人來侍奉相如。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】在「完璧歸趙」中，造成趙國君臣「猶疑不決」的直接外交難題是什麼？",
+                options: ["燕國想與趙國斷絕邦交", "秦國自恃強大，提出以十五城換取趙國的和氏璧", "廉頗與藺相如在朝堂上發生爭執", "齊國出兵攻打趙國的陽晉"],
+                correct: 1,
+                explanation: "解析：課文指出，起因是秦國自恃強大，以十五城換趙國的和氏璧，令趙國陷入答應與否的兩難處境。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】當初宦者令繆賢畏罪想要潛逃到哪一個國家？",
+                options: ["秦國", "燕國", "齊國", "楚國"],
+                correct: 1,
+                explanation: "解析：根據課文，繆賢因畏罪原本想潛逃到「燕國」，因為燕王曾對他握手結友。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】「完璧歸趙」中，藺相如是在什麼地方（宮殿）奉璧覲見秦王的？",
+                options: ["咸陽宮", "章臺", "西河", "阿房宮"],
+                correct: 1,
+                explanation: "解析：根據課文記述，秦王是在「章臺」接見相如，這也暴露了秦王傲慢且無意償城的態度。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】「澠池之會」的酒宴上，秦王藉口趙王愛好音樂，誘騙趙王做了什麼事？",
+                options: ["吹簫", "彈琴", "鼓瑟", "擊缶"],
+                correct: 2,
+                explanation: "解析：課文記載，秦王曰：「寡人竊聞趙王好音，請秦瑟。」於是趙王鼓瑟，秦御史隨即記下以侮辱趙王。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】在澠池之會上，面對秦國群臣的要求，藺相如請秦國割讓哪裡來為趙王祝壽？",
+                options: ["十五座城池", "石城", "咸陽（秦國首都）", "西河外"],
+                correct: 2,
+                explanation: "解析：秦群臣請以趙十五城為秦王壽，藺相如立刻反擊，請以秦首都「咸陽」為趙王壽，成功保存國家尊嚴。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】廉頗不服藺相如，向外宣稱「我見相如，必辱之」的表面原因是什麼？",
+                options: ["相如私自放走了罪犯繆賢", "相如在澠池之會上丟了趙王的顏面", "自己有攻城野戰之大功，而相如只靠口舌為勞，地位卻在自己之上", "相如偷走了和氏璧"],
+                correct: 2,
+                explanation: "解析：廉頗不服的原因在於他認為自己有攻城野戰之功，而相如徒以口舌為勞，且出身卑賤，不甘居其下。[cite: 2]"
+            },
+            {
+                question: "【淺．字詞語譯】試解釋加底線的字：\n「秦王大喜，傳以示美人及<span class='underline'>左右</span>。」",
+                options: ["左邊和右邊", "身邊的侍從、隨從", "大約、大概", "支配、控制"],
+                correct: 1,
+                explanation: "解析：在古漢語中，「左右」常借代或指稱身邊的侍臣、侍從。此處指秦王將璧玉傳給宮女和侍從觀看。[cite: 2]"
+            },
+            {
+                question: "【淺．字詞語譯】試解釋加底線的字：\n「因賓客至藺相如門<span class='underline'>謝</span>罪。」",
+                options: ["感謝、致謝", "辭別、告辭", "認錯、道歉", "拒絕、推辭"],
+                correct: 2,
+                explanation: "解析：此處「謝」為「認錯、道歉」之意。「謝罪」即為自己的過錯表示認錯道歉。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】藺相如用計成功騙回和氏璧時，口頭上對秦王撒了什麼謊？",
+                options: ["城池的割讓地圖有錯誤", "和氏璧是假的，真的在趙國", "璧玉上有瑕疵，要指給秦王看", "趙王改變主意不想換了"],
+                correct: 2,
+                explanation: "解析：相如視秦王無意償城，乃前曰：「璧有瑕，請指示王。」藉此成功騙回璧玉。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】「負荊請罪」的結局，藺相如與廉頗最終建立了什麼關係？",
+                options: ["成為政敵", "結為生死與共的「刎頸之交」", "相如拜廉頗為師", "兩人一同被趙王放逐"],
+                correct: 1,
+                explanation: "解析：根據課文結尾，廉頗請罪後，兩人不計前嫌，「卒相與歡，爲刎頸之交」，即生死與共的朋友。[cite: 2]"
+            },
+            {
+                question: "【淺．人物性格】廉頗「因賓客至藺相如門謝罪。曰：『鄙賤之人，不知將軍寬之至此也。』」這直接表現他哪種性格？",
+                options: ["膽小怯懦", "知錯能改、勇於改過", "狡猾多詐", "阿諛奉承"],
+                correct: 1,
+                explanation: "解析：將軍廉頗聽聞相如大義後深受感動，背負荊條親自登門認錯，展現了他「勇於改過」的爽直品格。[cite: 2]"
+            },
+            {
+                question: "【淺．人物性格】在「完璧歸趙」中，藺相如能夠看穿秦王無意償城，並大膽持璧倚柱。這主要凸顯他什麼性格？",
+                options: ["貪財吝嗇", "足智多謀、英勇果敢", "氣量狹小", "傲慢無禮"],
+                correct: 1,
+                explanation: "解析：相如用計取回璧玉並以死要脅，完美融合了「機智過人」與「膽色過人」的英勇性格。[cite: 2]"
+            },
+            {
+                question: "【淺．修辭手法】「怒髮上衝冠」這句話運用了哪一種修辭手法？",
+                options: ["對比", "設問", "誇張", "借代"],
+                correct: 2,
+                explanation: "解析：將憤怒時頭髮直豎、把帽子頂起來的狀態故意誇大渲染，屬於「誇張」修辭。[cite: 2]"
+            },
+            {
+                question: "【淺．修辭手法】「今兩虎共鬥，其勢不俱生」中的「兩虎」是指哪兩個人？",
+                options: ["秦王與趙王", "廉頗與藺相如", "繆賢與燕王", "秦國與燕國"],
+                correct: 1,
+                explanation: "解析：這是相如對門客說的話，以「兩虎」比喻自己與大將軍廉頗這兩位趙國棟樑。[cite: 2]"
+            },
+            {
+                question: "【淺．修辭手法】文章開頭寫「廉頗者，趙之良將也……拜為上卿，以勇氣聞於諸諸侯」，這種手法屬於：",
+                options: ["直接描寫（行為與肖像）", "直接描寫（作者直接點出人物身份與功勳）", "側面描寫", "心理描寫"],
+                correct: 1,
+                explanation: "解析：開篇直接交代人物的出身、職位與歷史功績，屬於直接描寫中對身份與成就的客觀陳述。[cite: 2]"
+            },
+            {
+                question: "【淺．情節理解】澠池之會中，是誰在秦王被迫擊缶後，立刻召喚趙國史官記下這件事的？",
+                options: ["廉頗", "趙王", "藺相如", "繆賢"],
+                correct: 2,
+                explanation: "解析：藺相如在強迫秦王擊缶後，「顧召趙御史書曰：某年月日，秦王為趙王擊缻」，反應極其敏捷。[cite: 2]"
+            },
+            {
+                question: "【淺．人物性格】面對秦王邀請赴澠池之會，趙王的初步反應是「畏秦，欲毋行」。這暴露出趙王當時：",
+                options: ["優柔寡斷、怯懦怕事", "深謀慮遠", "虛心納諫", "用人唯才"],
+                correct: 0,
+                explanation: "解析：面對強秦的邀約，趙王因害怕而一度不敢前往，暴露出其性格中怯懦怕事的一面。[cite: 2]"
+            }
+        ],
+        
+        // 【深】難度題目組（修正「三短一長」盲點，字數已全面均衡，共 19 題）
+        deep: [
+            {
+                question: "【深．字詞活用】試分析加底線字的詞性活用：\n「乃使其從者<span class='underline'>衣</span>褐，懷其璧。」",
+                options: [
+                    "名詞，指粗布平民衣服", 
+                    "名詞活用作動詞，穿著", 
+                    "動詞活用作名詞，褐衣", 
+                    "形容詞活用動詞，變舊"
+                ],
+                correct: 1,
+                explanation: "解析：根據注釋，「衣」在此處讀 [ji3]/[yi]，名詞活用作動詞，解作「穿著粗布衣服」，是典型的詞性活用。[cite: 2]"
+            },
+            {
+                question: "【深．字詞活用】試分析加底線字的詞性活用：\n「左右欲<span class='underline'>刃</span>相如，相如張目叱之。」",
+                options: [
+                    "名詞，指鋒利的兵器", 
+                    "形容詞活用，變得鋒利", 
+                    "名詞活用作動詞，刺殺", 
+                    "動詞活用作名詞，利刃"
+                ],
+                correct: 2,
+                explanation: "解析：「刃」本義為名詞刀刃，在此處位於能願動詞「欲」之後，活用為動詞，解作「用刀刺殺」。[cite: 2]"
+            },
+            {
+                question: "【深．煉字賞析】「相如<span class='underline'>度</span>秦王特以詐佯為予趙城」中的「度」字，傳達了相如怎樣的心理狀態？",
+                options: [
+                    "憑空產生的主觀懷疑", 
+                    "基於細節的精準判斷", 
+                    "極度恐懼而不知所措", 
+                    "單純推算城池的價值"
+                ],
+                correct: 1,
+                explanation: "解析：「度」在此處意為揣度、估計。凸顯相如並非盲目衝動，而是基於秦王在章臺的傲慢表現，作出的精準心理判斷。[cite: 2]"
+            },
+            {
+                question: "【深．煉字賞析】「計<span class='underline'>未</span>定，求人可使報秦者，<span class='underline'>未</span>得。」課文連續使用兩個「未」字，在結構與氣氛上有何深意？",
+                options: [
+                    "反映趙王無意解決危機", 
+                    "突顯趙國朝廷缺乏凝聚力", 
+                    "渲染束手無策與焦慮處境", 
+                    "暗示秦國將主動放棄強索"
+                ],
+                correct: 2,
+                explanation: "解析：第一個「未」字彰顯了趙國君臣在給與不給之間的游移兩難；第二個「未」字點出在危機中能擔大任的人才極其罕見，為相如的登場製造了強烈的懸念與鋪墊。[cite: 2]"
+            },
+            {
+                question: "【深．情節推論】藺相如主張「寧許以負秦曲」，這項外交決策背後的深層戰略考量是什麼？",
+                options: [
+                    "弱國無外交，順從強秦以求保全", 
+                    "在道義上使秦理虧以換外交主動", 
+                    "討好秦國，藉機為自己留好退路", 
+                    "拖延時間，等待趙國調度軍隊"
+                ],
+                correct: 1,
+                explanation: "解析：相如認為「均之二策，寧許以負秦曲。」選擇給予璧玉，若秦不予城，則理虧在秦，這能將道德責任推給秦國，使趙國在外交上站穩腳跟。[cite: 2]"
+            },
+            {
+                question: "【深．人物性格】秦王在章臺接見相如並傳璧嬉笑，事後相如完璧歸趙，秦王卻「卒廷見相如，畢禮而歸之」。這反映了秦王性格的哪一面？",
+                options: [
+                    "生性多疑，容易被臣下欺騙", 
+                    "反覆無常，缺乏君王基本威嚴", 
+                    "冷靜理智，能權衡政治利害", 
+                    "徹底放棄，不再對趙國動刀兵"
+                ],
+                correct: 2,
+                explanation: "解析：秦王雖奸詐傲慢，但他發現璧已歸趙後，深知「今殺相如，終不能得璧也，而絕秦趙之歡。不如因而厚遇之」，反映他能冷靜衡量大局利害。[cite: 2]"
+            },
+            {
+                question: "【深．人物性格】大將軍廉頗在澠池之會前，對趙王說「三十日不還，則請立太子為王」。這項建議如何體現廉頗的性格？",
+                options: [
+                    "圖謀不軌，私下與太子結盟", 
+                    "率直粗魯，說話不顧君臣禮節", 
+                    "思慮周全，斷絕秦國要挾念頭", 
+                    "拥兵自重，意圖架空趙王權力"
+                ],
+                correct: 2,
+                explanation: "解析：這句話是最高明的軍事政治防禦。它能讓秦國明白，即使扣留趙王也無法要挾趙國，體現了廉頗「考慮周密、顧慮周全」的大局觀。[cite: 2]"
+            },
+            {
+                question: "【深．寫作手法】文章在藺相如正式登場前，詳寫了繆賢與相如的往事。這種手法對刻畫藺相如有何結構作用？",
+                options: [
+                    "直接描寫，交代相如出身寒微", 
+                    "側面描寫，藉他人評價作鋪墊", 
+                    "心理描寫，展現繆賢畏罪恐懼", 
+                    "對比手法，突顯趙王任人唯親"
+                ],
+                correct: 1,
+                explanation: "解析：此為側面描寫。透過繆賢口中的正面評價及相如分析燕王心理的往事，間接向讀者與趙王引薦相如的卓越才能，屬於極佳的鋪墊手法。[cite: 2]"
+            },
+            {
+                question: "【深．寫作手法】「完璧歸趙」一節中，太史公將趙國君臣的「猶疑不決、束手無策」與藺相如的「機智果斷」並列。這在寫作手法上屬於：",
+                options: [
+                    "對比，拉平朝堂人物的地位", 
+                    "反襯，以君臣無能凸顯主角", 
+                    "借喻，以劣馬比喻滿朝文武", 
+                    "設問，透過君臣提問引發思考"
+                ],
+                correct: 1,
+                explanation: "解析：這屬於襯托（反襯）。兩者具有明顯的主次之分（相如為主，君臣為賓），目的是為了令主角相如的機智果斷顯得更加鮮明深刻。[cite: 2]"
+            },
+            {
+                question: "【深．寫作手法】關於文章中「對比」與「襯托」的分別，下列敘述何者完全符合筆記的定義？",
+                options: [
+                    "對比具主次之分，襯托則無主次", 
+                    "對比無主次之分，襯托具主次之分", 
+                    "對比用於正面，襯托只能用於反面", 
+                    "對比針對情節，襯托只能針對人物"
+                ],
+                correct: 1,
+                explanation: "解析：對比無主次之分（如相如與廉頗的心胸對比，使兩者形象皆鮮明）；襯托具主次之分（如門客不齒忍讓襯托相如以國家為重）。[cite: 2]"
+            },
+            {
+                question: "【深．修辭效果】「怒髮上衝冠。左右欲刃相如，相如張目叱之，左右皆靡。」這段話同時融合了什麼手法與效果？",
+                options: [
+                    "肖像描寫與側面描寫突顯膽色", 
+                    "心理描寫與借代手法展現恐懼", 
+                    "行為描寫與正面對比刻畫怯懦", 
+                    "誇張修辭與設問手法引導思考"
+                ],
+                correct: 0,
+                explanation: "解析：這段話既有「怒髮上衝冠」的直接肖像與誇張描寫，也有「左右皆靡」（侍從被嚇退）的側面描寫，雙重凸顯了相如震懾全場的過人膽色。[cite: 2]"
+            },
+            {
+                question: "【深．修辭辨析】「今兩虎共鬥，其勢不俱生」在修辭上屬於「借喻」。它與「借代」最核心的分別是什麼？",
+                options: [
+                    "借喻看重部分，借代看重全體", 
+                    "借喻特徵相似，借代具相關聯性", 
+                    "借喻不需喻詞，借代必須有喻詞", 
+                    "借喻指代事物，借代只能指代人"
+                ],
+                correct: 1,
+                explanation: "解析：根據修辭定義，借喻是比喻的一種（獨立個體，特徵相似）；借代則不直接說出名稱，而是以「本身相關的事物或部分」來代替全體（如用布衣代平民）。[cite: 2]"
+            },
+            {
+                question: "【深．修辭辨析】下列哪一組句子**全部**運用了「借代」修辭手法？",
+                options: [
+                    "①怒髮上衝冠 ②今兩虎共鬥", 
+                    "①布衣之交 ②衣褐 ③就湯鑊", 
+                    "①爭列高下 ②引車避匿巷中", 
+                    "①相視而嘻 ②獨畏廉將軍哉"
+                ],
+                correct: 1,
+                explanation: "解析：布衣（代平民）、衣褐（代穿平民衣服）、湯鑊（代滾湯烹煮的死刑），皆屬於「以部分或相關特徵代替本體」的借代修辭。[cite: 2]"
+            },
+            {
+                question: "【深．結構修辭】「於是趙王乃齋戒五日……何者？嚴大國之威以修敬也。」這段話運用了設問修辭，其主要文學效果是：",
+                options: [
+                    "加強反詰語氣以全盤否定強秦", 
+                    "吸引讀者注意並引導思考外交原因", 
+                    "暗示趙王內心對割地的極度不滿", 
+                    "故意放慢敘事節奏以舒緩緊張感"
+                ],
+                correct: 1,
+                explanation: "解析：設問是「自問自答」，其核心效果在於吸引讀者注意力，引導讀者去思考後面給出的答案與原因。[cite: 2]"
+            },
+            {
+                question: "【深．文意推論】在負荊請罪前，門客不理解相如的忍讓而提出辭職。這段情節在全篇結構與襯托上有何作用？",
+                options: [
+                    "說明相如治家不嚴致使人才流失", 
+                    "以門客器量反襯相如顧全大局胸襟", 
+                    "暗示廉頗已派間諜刺探相如虛實", 
+                    "揭露門客皆為追逐名利的庸碌之輩"
+                ],
+                correct: 1,
+                explanation: "解析：門客因不齒相如躲避而請辭，這正好作為「賓」，反襯出相如「先國家之急而後私讎」的廣闊胸襟與遠大目光。[cite: 2]"
+            },
+            {
+                question: "【深．人物性格】廉頗宣言一見相如必辱之，這與相如後來的胸襟形成強烈對比。這種性格對比在情節發展上有何作用？",
+                options: [
+                    "預示文臣武將註定無法和諧共事", 
+                    "製造衝突懸念使故事更曲折跌宕", 
+                    "暗示趙王即將對廉頗實施削權", 
+                    "證明文官的口才遠勝武將的戰功"
+                ],
+                correct: 1,
+                explanation: "解析：廉頗心胸狹窄與相如顧全大局的對比，不僅使人物特徵鮮明，更在負荊請罪前「營造衝突矛盾，使情節更加曲折跌宕」。[cite: 2]"
+            },
+            {
+                question: "【深．語文基礎】反問修辭又稱「反詰」。下列哪一個句子屬於「寓答於問、明知故問」的**反問**句？",
+                options: [
+                    "何者？嚴大國之威以修敬也。", 
+                    "相如雖駑，獨畏廉將軍哉？", 
+                    "求人可使報秦者，未得。", 
+                    "誰人出使秦國？"
+                ],
+                correct: 1,
+                explanation: "解析：「相如雖駑，獨畏廉將軍哉？」（我難道真的怕廉將軍嗎？）答案隱含在否定問句中，意思是「我根本不怕」，屬於「反問」，具備增強語氣的效果。[cite: 2]"
+            },
+            {
+                question: "【深．結構推論】文章開頭特別強調「藺相如徒以口舌為勞，而位居我上，且相如素賤人，吾羞」。這句話在全文結構上具有什麼作用？",
+                options: [
+                    "屬於沒落段落的隨意插敘描寫", 
+                    "為後文將相衝突與和好埋下伏筆", 
+                    "客觀證實相如的出身確實不光彩", 
+                    "諷刺趙王是一位昏庸無道的君主"
+                ],
+                correct: 1,
+                explanation: "解析：這句話前後照應了前文相如因兩次外交大功而被封為上卿、位居廉頗之上的情節，為後續兩人的衝突與將相和「埋下伏筆並前後照應」。[cite: 2]"
+            },
+            {
+                question: "【深．結構推論】「完璧歸趙」結局寫道：「秦亦不以城予趙，趙亦終不予秦璧。」這兩句看似回到原點的話，在宏觀歷史結構上有何意義？",
+                options: [
+                    "宣告藺相如的外交努力付諸東流", 
+                    "證明秦趙兩國達成了平等的邦交", 
+                    "照應並確立了完璧歸趙的政治承諾", 
+                    "暗示趙國未來將無法抵擋秦國侵略"
+                ],
+                correct: 2,
+                explanation: "解析：相如出使前曾對趙王承諾「城不入，臣請完璧歸趙」。結局這句話，完美「照應」了相如當初的政治承諾，證明他確實保全了國家尊嚴。[cite: 2]"
+            }
+        ]
+    };
+
+    // 運行時變數與核心 JavaScript 邏輯保持不變...
+    let activeQuestionSet = []; 
+    let currentQuestionIndex = 0; 
+    let score = 0;
+    let selectedOptionIndex = null;
+    let isAnswered = false;
+    let userMode = "";
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const submitBtn = document.getElementById('submit-btn');
+    const resultBox = document.getElementById('result-box');
+    const resultStatus = document.getElementById('result-status');
+    const explanationText = document.getElementById('explanation-text');
+    const quizBox = document.getElementById('quiz-box');
+    const summaryBox = document.getElementById('summary-box');
+    const progressText = document.getElementById('progress');
+    const levelTag = document.getElementById('level-tag');
+
+    function initQuiz() {
+        isAnswered = false;
+        selectedOptionIndex = null;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "確認選擇並開始";
+        progressText.innerText = "【分流自評】第 1 步";
+        levelTag.style.display = "none";
+        questionText.innerHTML = allQuestions.routing.question.replace(/\n/g, '<br>');
+        
+        optionsContainer.innerHTML = '';
+        allQuestions.routing.options.forEach((option, index) => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+            li.innerText = option;
+            li.addEventListener('click', () => {
+                if (isAnswered) return;
+                const items = optionsContainer.querySelectorAll('.option-item');
+                items.forEach(item => item.classList.remove('selected'));
+                li.classList.add('selected');
+                selectedOptionIndex = index;
+                submitBtn.disabled = false;
+            });
+            optionsContainer.appendChild(li);
+        });
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        selectedOptionIndex = null;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "提交答案";
+        resultBox.className = "result-area";
+        progressText.innerText = `題目：${currentQuestionIndex + 1} / ${activeQuestionSet.length}`;
+        
+        const currentData = activeQuestionSet[currentQuestionIndex];
+        questionText.innerHTML = currentData.question.replace(/\n/g, '<br>');
+        
+        optionsContainer.innerHTML = '';
+        currentData.options.forEach((option, index) => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+            li.innerText = option;
+            li.addEventListener('click', () => selectOption(index, li));
+            optionsContainer.appendChild(li);
+        });
+    }
+
+    function selectOption(index, element) {
+        if (isAnswered) return;
+        const items = optionsContainer.querySelectorAll('.option-item');
+        items.forEach(item => item.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedOptionIndex = index;
+        submitBtn.disabled = false;
+    }
+
+    submitBtn.addEventListener('click', () => {
+        if (userMode === "") {
+            userMode = (selectedOptionIndex === 0) ? "deep" : "shallow";
+            activeQuestionSet = allQuestions[userMode];
+            
+            levelTag.style.display = "inline-block";
+            if (userMode === "deep") {
+                levelTag.innerText = "組別：【深】進階挑戰";
+                levelTag.style.backgroundColor = "var(--level-deep)";
+            } else {
+                levelTag.innerText = "組別：【淺】基礎鞏固";
+                levelTag.style.backgroundColor = "var(--level-shallow)";
+            }
+            
+            isAnswered = true;
+            resultBox.className = "result-area correct";
+            resultStatus.innerHTML = `<strong>🎯 分流成功！</strong> 你已選擇「${allQuestions.routing.options[selectedOptionIndex]}」。`;
+            explanationText.innerText = allQuestions.routing.explanation;
+            submitBtn.innerText = "開始第一題";
+            return;
+        }
+
+        if (!isAnswered) {
+            isAnswered = true;
+            const currentData = activeQuestionSet[currentQuestionIndex];
+            
+            if (selectedOptionIndex === currentData.correct) {
+                score++;
+                resultBox.className = "result-area correct";
+                resultStatus.innerHTML = "<strong>⭕ 回答正確！</strong>";
+            } else {
+                resultBox.className = "result-area wrong";
+                resultStatus.innerHTML = `<strong>❌ 回答錯誤。</strong> 正確答案是：${currentData.options[currentData.correct]}`;
+            }
+            
+            explanationText.innerText = currentData.explanation;
+            
+            if (currentQuestionIndex < activeQuestionSet.length - 1) {
+                submitBtn.innerText = "下一題";
+            } else {
+                submitBtn.innerText = "觀看評估結果";
+            }
+        } else {
+            if (submitBtn.innerText === "開始第一題") {
+                loadQuestion();
+            } else {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < activeQuestionSet.length) {
+                    loadQuestion();
+                } else {
+                    showSummary();
+                }
+            }
+        }
+    });
+
+    function showSummary() {
+        quizBox.style.display = 'none';
+        progressText.style.display = 'none';
+        levelTag.style.display = 'none';
+        summaryBox.style.display = 'block';
+        
+        let evaluation = "";
+        const rate = (score / activeQuestionSet.length) * 100;
+        
+        if (userMode === "deep") {
+            if (rate >= 85) evaluation = "👑 卓越超群！你在【深】難度組別中表現極佳，對文言詞性活用、煉字心理及史傳結構有極深刻的洞察力！";
+            else if (rate >= 60) evaluation = "👍 相當不錯！能應付大部分精細的寫作手法題，建議針對錯題對照老師筆記的「借喻與借代辨析」再行深化。";
+            else evaluation = "📚 挑戰精神可嘉！【深】難度組別涉及較多抽象手法，建議先切換至【淺】難度組別穩固基本情節與字義。";
+        } else {
+            if (rate >= 85) evaluation = "🌟 基礎非常紮實！你在【淺】難度組別中成功通關。情節與核心語譯已無大礙，建議下次可以大膽挑戰【深】難度題目！";
+            else if (rate >= 60) evaluation = "✍️ 表現尚可！故事的大致脈絡已掌握，但部分字詞（如『見』的被動或『左右』借代）仍有混淆，請加強基本功。";
+            else evaluation = "📖 仍需努力！建議重新溫習課文的導讀與情節發展表，理清「完璧歸趙」與「澠池之會」的起因與結果。";
+        }
+
+        summaryBox.innerHTML = `
+            <h2>🎉 分層評估挑戰完成！</h2>
+            <p style="font-size:1.1rem; color:#5a6364;">評估組別：${userMode === 'deep' ? '【深】進階挑戰' : '【淺】基礎鞏固'}</p>
+            <p>你的總得分：${score} / ${activeQuestionSet.length}</p>
+            <p>答對率：${Math.round(rate)}%</p>
+            <div style="font-size: 1.05rem; background-color: rgba(248, 249, 250, 0.9); padding: 15px; border-radius: 8px; color: #34495e; margin: 20px 0; font-weight: normal; border: 1px solid #e2e8f0; text-align: left;">
+                ${evaluation}
+            </div>
+            <p style="font-size: 0.95rem; color: #5a6364; font-weight: normal;">「先國家之急而後私讎」，針對弱點補強，必能克敵制勝！</p>
+            <button class="btn-submit" style="margin-top: 20px;" onclick="location.reload()">重新選擇組別測驗</button>
+        `;
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>
